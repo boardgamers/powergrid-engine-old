@@ -1,0 +1,41 @@
+{
+  "name": "powergrid",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/lodash": "^4.14.157",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.14",
+    "@types/seedrandom": "^2.4.28",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "chai": "^4.2.0",
+    "eslint": "^7.4.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^8.0.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "seedrandom": "^3.0.5"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run test && npm run clean && tsc",
+    "build": "npm run clean && tsc",
+    "clean": "rm -Rf dist",
+    "lint": "eslint . --ext .ts",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts src/*.spec.ts"
+  },
+  "files": [
+    "index.ts",
+    "wrapper.ts",
+    "src",
+    "dist",
+    "tsconfig.json"
+  ]
+}
