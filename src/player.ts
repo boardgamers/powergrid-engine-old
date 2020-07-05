@@ -12,11 +12,18 @@ export class Player {
     garbage: 0
   };
   money: number = 50;
+  // To reset every round
+  auctionDone = false;
+  name?: string;
 
   plants: Plant[] = [];
   cities: string[] = [];
 
   constructor (public color: PlayerColor) {
 
+  }
+
+  beginRound() {
+    this.auctionDone = false;
   }
 }
