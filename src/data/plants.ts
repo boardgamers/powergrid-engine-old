@@ -1,4 +1,4 @@
-import type Plant from "./plant";
+import type Plant from "../plant";
 
 const plants: Plant[] = [
   {price: 3, power: 1, energy: ["oil"], intake: 2},

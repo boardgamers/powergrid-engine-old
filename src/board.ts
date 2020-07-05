@@ -3,7 +3,7 @@ import type PlayerColor from "./enums/player-color";
 import type Resource from "./enums/resource";
 import type Plant from "./plant";
 import { shuffle } from "./utils";
-import plants from "./plants";
+import plants from "./data/plants";
 import maps from "./maps";
 
 class Board {
