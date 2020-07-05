@@ -66,23 +66,21 @@ class Board {
   constructor(seed: string) {
     this.draw = {
       plants: {
-        current: shuffle(plants.filter(plant => plant.price > 10), seed),
+        current: [plants.find(plant => plant.price === 13)!, ...shuffle(plants.filter(plant => plant.price > 10 && plant.price !== 13), seed)],
         future: []
       }
     };
 
     this.market = {
       current: {
-        plants: plants.filter(plant => plant.price <= 10),
+        plants: plants.slice(0, 4),
         max: 4
       },
       future: {
-        plants: [],
+        plants: plants.slice(4, 8),
         max: 4
       }
     };
-
-    this.reorderMarkets();
 
     this.map = {
       model: "us",
