@@ -2,7 +2,6 @@ import { TurnPhase } from "./enums/phases";
 import { MoveName } from "./enums/moves";
 import type { Engine } from "./engine";
 import type { Player } from "./player";
-import Plant from "./plant";
 
 const commands = {
   [TurnPhase.PlantAuction]: {

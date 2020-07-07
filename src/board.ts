@@ -2,7 +2,7 @@ import { sortBy } from "lodash";
 import type PlayerColor from "./enums/player-color";
 import type Resource from "./enums/resource";
 import type Plant from "./plant";
-import { shuffle } from "./utils";
+import { shuffle } from "./utils/random";
 import plants from "./data/plants";
 import maps from "./maps";
 
@@ -63,10 +63,10 @@ class Board {
     }
   }
 
-  constructor(seed: string) {
+  constructor(rng: () => number) {
     this.draw = {
       plants: {
-        current: [plants.find(plant => plant.price === 13)!, ...shuffle(plants.filter(plant => plant.price > 10 && plant.price !== 13), seed)],
+        current: [plants.find(plant => plant.price === 13)!, ...shuffle(plants.filter(plant => plant.price > 10 && plant.price !== 13), rng)],
         future: []
       }
     };

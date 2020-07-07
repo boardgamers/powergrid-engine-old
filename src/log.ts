@@ -29,5 +29,6 @@ export type GameEvent = {
 }
 
 export interface LogItem {
+  kind: "event",
   event: GameEvent
 };
