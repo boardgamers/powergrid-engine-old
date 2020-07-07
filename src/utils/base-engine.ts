@@ -1,6 +1,7 @@
 import { memoize } from "./memoize";
 import seedrandom from "seedrandom";
 import assert from "assert";
+import PlayerColor from "../enums/player-color";
 
 export default abstract class BaseEngine<
   Player,
@@ -63,7 +64,15 @@ export default abstract class BaseEngine<
     this.players = data.players;
   }
 
+  get currentPlayer() {
+    return this.#currentPlayer;
+  }
+
+  set currentPlayer(val: PlayerColor) {
+    this.#currentPlayer = val;
+  }
 
   #rng?: seedrandom.prng;
   #seed = "";
+  #currentPlayer: PlayerColor;
 }

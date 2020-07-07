@@ -1,4 +1,4 @@
-import { TurnPhase, MajorPhase } from "./enums/phases";
+import { RoundPhase, MajorPhase } from "./enums/phases";
 import Plant from "./plant";
 
 export enum GameEventName {
@@ -19,7 +19,7 @@ export type GameEvent = {
   round: number
 } | {
   name: GameEventName.PhaseChange,
-  phase: TurnPhase
+  phase: RoundPhase
 } | {
   name: GameEventName.MajorPhaseChange,
   phase: MajorPhase

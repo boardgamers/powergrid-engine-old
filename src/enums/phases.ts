@@ -4,7 +4,7 @@ export enum MajorPhase {
   Step3 = "step3"
 };
 
-export enum TurnPhase {
+export enum RoundPhase {
   PlantAuction = "auction",
   CommoditiesTrading = "commodities",
   Construction = "construction",

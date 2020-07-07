@@ -1,10 +1,19 @@
-import { TurnPhase } from "./enums/phases";
+import { RoundPhase } from "./enums/phases";
 import { MoveName } from "./enums/moves";
 import type { Engine } from "./engine";
 import type { Player } from "./player";
 
-const commands = {
-  [TurnPhase.PlantAuction]: {
+type CommandStruct = {
+  [phase in RoundPhase]?: {
+    [move in MoveName]?: {
+      available: (engine: Engine, player: Player) => boolean | any,
+      valid?: (move: any, available: any) => boolean
+    }
+  }
+}
+
+const commands: CommandStruct = {
+  [RoundPhase.PlantAuction]: {
     [MoveName.Pass]: {
       available(engine: Engine, player: Player) {
         if (engine.round === 1 && !engine?.auction && !player.auctionDone) {
@@ -62,12 +71,12 @@ const commands = {
           range: [Math.max(engine.auction.plant.price, (engine.auction.bid ?? 0) + 1), player.money]
         };
       },
-      match (move: {bid: number}, available: {range: [number, number]}) {
+      valid (move: {bid: number}, available: {range: [number, number]}) {
         return move.bid >= available.range[0] && move.bid <= available.range[1] && Math.floor(move.bid) === move.bid;
       }
     }
   },
-  [TurnPhase.Bureaucracy]: {
+  [RoundPhase.Bureaucracy]: {
 
   }
 }

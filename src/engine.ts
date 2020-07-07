@@ -2,16 +2,16 @@ import { Player } from "./player";
 import type PlayerColor from "./enums/player-color";
 import Board from "./board";
 import { shuffle } from "./utils/random";
-import { MajorPhase, TurnPhase as RoundPhase } from "./enums/phases";
+import { MajorPhase, RoundPhase } from "./enums/phases";
 import { LogItem, GameEventName } from "./log";
 import { memoize } from "./utils/memoize";
 import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
+import commands from './commands';
 
 export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
-  currentPlayer: PlayerColor;
 
   auction?: {
     participants: PlayerColor[],
@@ -24,6 +24,7 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
   board: Board;
   majorPhase: MajorPhase;
   minorPhase: RoundPhase;
+  availableCommands: Array<{move: MoveName, player: PlayerColor} & any>;
 
   init (players: number, seed: string) {
     this.seed = seed;
@@ -52,7 +53,9 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
       player.beginRound();
     }
 
-    // TODO: generate available commands
+    this.currentPlayer = this.turnorder[0];
+
+    this.generateAvailableCommands();
   }
 
   processLogItem(item: LogItem) {
@@ -67,6 +70,45 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
         this.minorPhase = item.event.phase;
         break;
     }
+  }
+
+  get currentPlayer() {
+    if (this.auction) {
+      return this.auction.current;
+    }
+
+    return super.currentPlayer;
+  }
+
+  set currentPlayer(color: PlayerColor) {
+    super.currentPlayer = color;
+  }
+
+  generateAvailableCommands() {
+    const functions = commands[this.minorPhase]!;
+
+    const availableCommands: any[] = [];
+
+    for (const [move, obj] of Object.entries(functions)) {
+      if (!obj) {
+        continue;
+      }
+
+      const availTest = obj.available(this, this.player(this.currentPlayer));
+
+      if (availTest) {
+        const base = {move, player: this.currentPlayer};
+        if (availTest === true) {
+          availableCommands.push(base);
+        } else if (Array.isArray(availTest)) {
+          availableCommands.push(...availTest.map(x => ({...x, ...base})));
+        } else {
+          availableCommands.push({...availTest, ...base});
+        }
+      }
+    }
+
+    this.availableCommands = availableCommands;
   }
 
   @memoize()
