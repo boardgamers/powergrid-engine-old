@@ -1,5 +1,3 @@
-# gaia-engine
-
 Typescript engine for Powergrid, made for [boardgamers](https://boardgamers.space) but it can be used with any other website or service.
 
 ## Setup
