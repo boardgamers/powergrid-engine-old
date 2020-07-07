@@ -6,10 +6,10 @@ import { MajorPhase, TurnPhase as RoundPhase } from "./enums/phases";
 import { LogItem, GameEventName } from "./log";
 import { memoize } from "./utils/memoize";
 import Plant from "./plant";
-import AbstractEngine from "./utils/abstract-engine";
+import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
 
-export class Engine extends AbstractEngine<Player, GameEventName, MoveName, LogItem, PlayerColor> {
+export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
   currentPlayer: PlayerColor;
 
@@ -55,9 +55,7 @@ export class Engine extends AbstractEngine<Player, GameEventName, MoveName, LogI
     // TODO: generate available commands
   }
 
-  addLog(item: LogItem) {
-    this.log.push(item);
-
+  processLogItem(item: LogItem) {
     switch (item.event.name) {
       case GameEventName.RoundStart:
         this.round = item.event.round;

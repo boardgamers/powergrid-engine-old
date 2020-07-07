@@ -2,7 +2,7 @@ import { memoize } from "./memoize";
 import seedrandom from "seedrandom";
 import assert from "assert";
 
-export default class AbstractEngine<
+export default abstract class BaseEngine<
   Player,
   GameEventName = string,
   MoveName = string,
@@ -12,8 +12,18 @@ export default class AbstractEngine<
   round: number = 0;
   log: LogItem[] = [];
 
-  #rng?: seedrandom.prng;
-  #seed = "";
+  addLog(item: LogItem) {
+    this.log.push(item);
+    this.processLogItem(item);
+  }
+
+  /**
+   * Change state by executing given log item
+   *
+   * Useful to replay a game just from log. Ideally log items are enough to fully reproduce a game
+   * @param item
+   */
+  abstract processLogItem(item: LogItem): void;
 
   get seed() {
     return this.#seed;
@@ -52,4 +62,8 @@ export default class AbstractEngine<
     this.#rng = seedrandom("", {state: data.rngState});
     this.players = data.players;
   }
+
+
+  #rng?: seedrandom.prng;
+  #seed = "";
 }
