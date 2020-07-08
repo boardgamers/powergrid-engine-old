@@ -2,45 +2,19 @@ import { RoundPhase } from "./enums/phases";
 import { MoveName } from "./enums/moves";
 import type { Engine } from "./engine";
 import type { Player } from "./player";
-import PlayerColor from "./enums/player-color";
-
-type AvailableCommandArgument<move> = (move extends keyof AvailableCommandArguments ? AvailableCommandArguments[move] : undefined);
-type CommandArgument<move> = (move extends keyof CommandArguments ? CommandArguments[move] : {});
-
-type CommandStruct = {
-  [phase in RoundPhase]?: {
-    [move in MoveName]?: {
-      available: (engine: Engine, player: Player) => Exclude<boolean | AvailableCommandArgument<move> | AvailableCommandArgument<move>[], undefined[] | (AvailableCommandArgument<move> extends undefined ? undefined : true)>,
-      valid?: (move: CommandArgument<move>, available: AvailableCommandArgument<move> | AvailableCommandArgument<move>[]) => boolean
-    }
-  }
-}
+import { CommandStruct } from "./utils/commands";
 
 export type AvailableCommandArguments = {
   [MoveName.Auction]: {plants: number[]};
   [MoveName.Bid]: {range: [number, number]};
 }
 
-type _AvailableCommand<move extends MoveName> = AvailableCommandArgument<move> extends undefined ? {move: move, player: PlayerColor} : {move: move, player: PlayerColor, data: AvailableCommandArgument<move>};
-export type AvailableCommands = {
-  [key in MoveName]: _AvailableCommand<key>;
-}
-
-type _MoveNameWithArguments = {
-  [key in MoveName]: AvailableCommandArgument<key> extends undefined ? undefined : key
-};
-
-export type MoveNameWithoutArguments = Exclude<MoveName, Exclude<_MoveNameWithArguments[MoveName], undefined>>;
-export type MoveNameWithArguments = Exclude<MoveName, MoveNameWithoutArguments>;
-
-export type AvailableCommand = AvailableCommands[MoveName];
-
 interface CommandArguments {
   [MoveName.Auction]: {plant: number};
   [MoveName.Bid]: {bid: number};
 }
 
-const commands: CommandStruct = {
+const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCommandArguments, CommandArguments> = {
   [RoundPhase.PlantAuction]: {
     [MoveName.Pass]: {
       available(engine: Engine, player: Player) {

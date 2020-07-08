@@ -8,11 +8,9 @@ import { memoize } from "./utils/memoize";
 import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
-import commands, { MoveNameWithoutArguments } from './commands';
-import type { AvailableCommand } from './commands';
-import { asserts } from "./utils";
+import commands from './commands';
 
-export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem, PlayerColor> {
+export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
 
   auction?: {
@@ -25,8 +23,6 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
 
   board: Board;
   majorPhase: MajorPhase;
-  minorPhase: RoundPhase;
-  availableCommands: Array<{move: MoveName, player: PlayerColor} & any>;
 
   init (players: number, seed: string) {
     this.seed = seed;
@@ -69,7 +65,7 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
         this.majorPhase = item.event.phase;
         break;
       case GameEventName.PhaseChange:
-        this.minorPhase = item.event.phase;
+        this.phase = item.event.phase;
         break;
     }
   }
@@ -87,33 +83,7 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
   }
 
   generateAvailableCommands() {
-    const functions = commands[this.minorPhase]!;
-
-    const availableCommands: AvailableCommand[] = [];
-
-    for (const [move, obj] of Object.entries(functions)) {
-      if (!obj) {
-        continue;
-      }
-
-      asserts<MoveName>(move);
-
-      const availTest = obj.available(this, this.player(this.currentPlayer));
-
-      if (availTest) {
-        const base = {move, player: this.currentPlayer};
-        if (availTest === true) {
-          asserts<MoveNameWithoutArguments>(move);
-          availableCommands.push({move, player: this.currentPlayer});
-        } else if (Array.isArray(availTest)) {
-          availableCommands.push(...(availTest as any[]).map(x => ({data: x, ...base})));
-        } else {
-          availableCommands.push({...availTest as any, move, player: this.currentPlayer});
-        }
-      }
-    }
-
-    this.availableCommands = availableCommands;
+    super.generateAvailableCommands(commands);
   }
 
   @memoize()

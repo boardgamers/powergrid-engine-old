@@ -1,21 +1,59 @@
 import { memoize } from "./memoize";
 import seedrandom from "seedrandom";
 import assert from "assert";
-import PlayerColor from "../enums/player-color";
+import { asserts } from './index';
+import { BaseCommandData, AvailableCommand, CommandStruct, MoveNameWithData, MoveNameWithoutData } from "./commands";
 
 export default abstract class BaseEngine<
   Player,
-  GameEventName = string,
-  MoveName = string,
+  Phase extends string = string,
+  MoveName extends string = string,
+  GameEventName extends string = string,
   LogItem extends {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}} = {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}},
-  PlayerId = number> {
+  PlayerId = number,
+  AvailableCommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>,
+  CommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>> {
+
+  phase: Phase;
   players: Player[];
   round: number = 0;
   log: LogItem[] = [];
+  availableCommands?: AvailableCommand<MoveName, AvailableCommandData, PlayerId>[];
 
   addLog(item: LogItem) {
     this.log.push(item);
     this.processLogItem(item);
+  }
+
+  generateAvailableCommands<Engine extends this = this>(commands: CommandStruct<Phase, MoveName, Player, Engine, AvailableCommandData, CommandData>) {
+    const functions = commands[this.phase]!;
+
+    const availableCommands: AvailableCommand<MoveName, AvailableCommandData, PlayerId>[] = [];
+
+    for (const [move, obj] of Object.entries(functions)) {
+      if (!obj) {
+        continue;
+      }
+
+      asserts<NonNullable<NonNullable<(typeof commands)[Phase]>[MoveName]>>(obj);
+      asserts<MoveName>(move);
+
+      const availTest = obj.available(this as Engine, this.player(this.currentPlayer));
+
+      if (availTest) {
+        if (availTest === true) {
+          asserts<MoveNameWithoutData<MoveName, AvailableCommandData>>(move);
+          availableCommands.push({move, player: this.currentPlayer} as unknown as AvailableCommand<MoveName, AvailableCommandData, PlayerId>);
+        } else if (Array.isArray(availTest)) {
+          asserts<MoveNameWithData<MoveName, AvailableCommandData>>(move);
+          availableCommands.push(...(availTest as any[]).map(x => ({data: x, move, player: this.currentPlayer}) as unknown as AvailableCommand<MoveName, AvailableCommandData, PlayerId>));
+        } else {
+          availableCommands.push({...availTest as any, move, player: this.currentPlayer});
+        }
+      }
+    }
+
+    this.availableCommands = availableCommands;
   }
 
   /**
@@ -68,11 +106,11 @@ export default abstract class BaseEngine<
     return this.#currentPlayer;
   }
 
-  set currentPlayer(val: PlayerColor) {
+  set currentPlayer(val: PlayerId) {
     this.#currentPlayer = val;
   }
 
   #rng?: seedrandom.prng;
   #seed = "";
-  #currentPlayer: PlayerColor;
+  #currentPlayer: PlayerId;
 }

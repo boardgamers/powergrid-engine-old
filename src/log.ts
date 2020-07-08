@@ -2,12 +2,12 @@ import { RoundPhase, MajorPhase } from "./enums/phases";
 import Plant from "./plant";
 
 export enum GameEventName {
-  GameStart,
-  RoundStart,
-  PhaseChange,
-  MajorPhaseChange,
-  DrawPlant,
-  GameEnd
+  GameStart = "gamestart",
+  RoundStart = "roundstart",
+  PhaseChange = "phasechange",
+  MajorPhaseChange = "majorphasechange",
+  DrawPlant = "drawplant",
+  GameEnd = "gameend"
 }
 
 export type GameEvent = {
