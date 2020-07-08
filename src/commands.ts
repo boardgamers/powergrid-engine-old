@@ -4,12 +4,12 @@ import type { Engine } from "./engine";
 import type { Player } from "./player";
 import { CommandStruct } from "./utils/commands";
 
-export type AvailableCommandArguments = {
+export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
   [MoveName.Bid]: {range: [number, number]};
 }
 
-interface CommandArguments {
+export interface CommandArguments {
   [MoveName.Auction]: {plant: number};
   [MoveName.Bid]: {bid: number};
 }
@@ -31,6 +31,9 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
 
         // Otherwise the player can decide to pass whenever during the auction
         return true;
+      },
+      exec(engine, player, move) {
+
       }
     },
     [MoveName.Auction]: {
@@ -57,6 +60,9 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
       },
       valid(move: {plant: number}, available: {plants: number[]}) {
         return available.plants.includes(move.plant);
+      },
+      exec(engine, player, move) {
+
       }
     },
     [MoveName.Bid]: {
@@ -75,6 +81,9 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
       },
       valid (move: {bid: number}, available: {range: [number, number]}) {
         return move.bid >= available.range[0] && move.bid <= available.range[1] && Math.floor(move.bid) === move.bid;
+      },
+      exec(engine, player, move) {
+
       }
     }
   },

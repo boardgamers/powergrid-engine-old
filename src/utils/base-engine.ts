@@ -2,7 +2,7 @@ import { memoize } from "./memoize";
 import seedrandom from "seedrandom";
 import assert from "assert";
 import { asserts } from './index';
-import { BaseCommandData, AvailableCommand, CommandStruct, MoveNameWithData, MoveNameWithoutData } from "./commands";
+import { BaseCommandData, AvailableCommand, CommandStruct, MoveNameWithData, MoveNameWithoutData, Command } from "./commands";
 
 export default abstract class BaseEngine<
   Player,
@@ -19,14 +19,17 @@ export default abstract class BaseEngine<
   round: number = 0;
   log: LogItem[] = [];
   availableCommands?: AvailableCommand<MoveName, AvailableCommandData, PlayerId>[];
+  ended = false;
 
   addLog(item: LogItem) {
     this.log.push(item);
     this.processLogItem(item);
   }
 
-  generateAvailableCommands<Engine extends this = this>(commands: CommandStruct<Phase, MoveName, Player, Engine, AvailableCommandData, CommandData>) {
-    const functions = commands[this.phase]!;
+  abstract commands(): CommandStruct<Phase, MoveName, Player, this, AvailableCommandData, CommandData>;
+
+  generateAvailableCommands() {
+    const functions = this.commands()[this.phase]!;
 
     const availableCommands: AvailableCommand<MoveName, AvailableCommandData, PlayerId>[] = [];
 
@@ -35,10 +38,15 @@ export default abstract class BaseEngine<
         continue;
       }
 
-      asserts<NonNullable<NonNullable<(typeof commands)[Phase]>[MoveName]>>(obj);
+      asserts<NonNullable<NonNullable<(ReturnType<this["commands"]>)[Phase]>[MoveName]>>(obj);
       asserts<MoveName>(move);
 
-      const availTest = obj.available(this as Engine, this.player(this.currentPlayer));
+      if (!obj.available) {
+        availableCommands.push({move, player: this.currentPlayer} as AvailableCommand<MoveName, AvailableCommandData, PlayerId>);
+        continue;
+      }
+
+      const availTest = obj.available!(this, this.player(this.currentPlayer));
 
       if (availTest) {
         if (availTest === true) {
@@ -54,6 +62,24 @@ export default abstract class BaseEngine<
     }
 
     this.availableCommands = availableCommands;
+  }
+
+  move(player: PlayerId, move: Command<MoveName, CommandData>) {
+    let avail = this.availableCommands?.filter(av => av.player === player);
+
+    assert(avail?.length ?? 0 > 0, `It's not the turn of player ${player}`);
+
+    avail = avail?.filter(av => av.move === move.move, `Player ${player} can't execute command ${move.move}`);
+
+    this.commands()[this.phase]![move.move]?.exec(this, this.player(player), move);
+
+    this.afterMove();
+  }
+
+  afterMove() {
+    if (!this.ended) {
+      this.generateAvailableCommands();
+    }
   }
 
   /**
@@ -91,6 +117,8 @@ export default abstract class BaseEngine<
       seed: this.seed,
       rngState : this.rng.state(),
       players: this.players,
+      phase: this.phase,
+      availableCommands: this.availableCommands
     }
   }
 
@@ -100,6 +128,8 @@ export default abstract class BaseEngine<
     this.seed = data.seed;
     this.#rng = seedrandom("", {state: data.rngState});
     this.players = data.players;
+    this.phase = data.phase;
+    this.availableCommands = data.availableCommands;
   }
 
   get currentPlayer() {

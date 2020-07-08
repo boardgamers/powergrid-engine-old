@@ -8,7 +8,9 @@ import { memoize } from "./utils/memoize";
 import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
-import commands from './commands';
+import commands, { CommandArguments } from './commands';
+import { Command } from "./utils/commands";
+import assert from "assert";
 
 export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
@@ -40,6 +42,7 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     this.log.push({event: {name: GameEventName.GameStart}, kind: "event"});
 
     this.roundStart();
+    this.generateAvailableCommands();
   }
 
   roundStart() {
@@ -52,8 +55,6 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     }
 
     this.currentPlayer = this.turnorder[0];
-
-    this.generateAvailableCommands();
   }
 
   processLogItem(item: LogItem) {
@@ -82,8 +83,8 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     super.currentPlayer = color;
   }
 
-  generateAvailableCommands() {
-    super.generateAvailableCommands(commands);
+  commands() {
+    return commands;
   }
 
   @memoize()
