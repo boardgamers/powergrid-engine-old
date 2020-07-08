@@ -8,7 +8,9 @@ import { memoize } from "./utils/memoize";
 import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
-import commands from './commands';
+import commands, { MoveNameWithoutArguments } from './commands';
+import type { AvailableCommand } from './commands';
+import { asserts } from "./utils";
 
 export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
@@ -87,23 +89,26 @@ export class Engine extends BaseEngine<Player, GameEventName, MoveName, LogItem,
   generateAvailableCommands() {
     const functions = commands[this.minorPhase]!;
 
-    const availableCommands: any[] = [];
+    const availableCommands: AvailableCommand[] = [];
 
     for (const [move, obj] of Object.entries(functions)) {
       if (!obj) {
         continue;
       }
 
+      asserts<MoveName>(move);
+
       const availTest = obj.available(this, this.player(this.currentPlayer));
 
       if (availTest) {
         const base = {move, player: this.currentPlayer};
         if (availTest === true) {
-          availableCommands.push(base);
+          asserts<MoveNameWithoutArguments>(move);
+          availableCommands.push({move, player: this.currentPlayer});
         } else if (Array.isArray(availTest)) {
-          availableCommands.push(...availTest.map(x => ({...x, ...base})));
+          availableCommands.push(...(availTest as any[]).map(x => ({data: x, ...base})));
         } else {
-          availableCommands.push({...availTest, ...base});
+          availableCommands.push({...availTest as any, move, player: this.currentPlayer});
         }
       }
     }
