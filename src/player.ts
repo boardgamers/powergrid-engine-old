@@ -13,7 +13,7 @@ export class Player {
   };
   money: number = 50;
   // To reset every round
-  auctionDone = false;
+  acquiredPlant = false;
   name?: string;
 
   plants: Plant[] = [];
@@ -24,6 +24,6 @@ export class Player {
   }
 
   beginRound() {
-    this.auctionDone = false;
+    this.acquiredPlant = false;
   }
 }

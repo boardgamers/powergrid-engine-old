@@ -93,6 +93,10 @@ class Board {
     this.market.current.plants = marketPlants.slice(0, this.market.current.max);
     this.market.future.plants = marketPlants.slice(this.market.current.max, this.market.current.max + this.market.future.max);
   }
+
+  drawPlant(): Plant | undefined {
+    return this.draw.plants.current.shift();
+  }
 }
 
 export default Board;

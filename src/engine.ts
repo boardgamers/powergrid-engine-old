@@ -3,14 +3,12 @@ import type PlayerColor from "./enums/player-color";
 import Board from "./board";
 import { shuffle } from "./utils/random";
 import { MajorPhase, RoundPhase } from "./enums/phases";
-import { LogItem, GameEventName } from "./log";
+import { LogItem, GameEventName, GameEventData, GameEvent } from "./log";
 import { memoize } from "./utils/memoize";
 import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
-import commands, { CommandArguments } from './commands';
-import { Command } from "./utils/commands";
-import assert from "assert";
+import commands from './commands';
 
 export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
@@ -20,7 +18,6 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     current: PlayerColor,
     plant: Plant,
     bid?: number,
-    bidder?: number
   }
 
   board: Board;
@@ -33,41 +30,92 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     this.round = 0;
 
     const colors: PlayerColor[] = shuffle(["red", "blue", "brown", "green", "purple", "yellow"] as PlayerColor[], this.rng).slice(0, players);
-    this.turnorder = colors;
 
     for (let i = 0; i < players; i++) {
       this.players.push(new Player(colors[i]));
     }
 
-    this.log.push({event: {name: GameEventName.GameStart}, kind: "event"});
+    this.addEvent(GameEventName.GameStart);
+    this.addEvent(GameEventName.MajorPhaseChange, {phase: MajorPhase.Step1});
 
     this.roundStart();
     this.generateAvailableCommands();
   }
 
   roundStart() {
-    this.addLog({event: {name: GameEventName.MajorPhaseChange, phase: MajorPhase.Step1}, kind: "event"});
-    this.addLog({event: {name: GameEventName.PhaseChange, phase: RoundPhase.PlantAuction}, kind: "event"});
-    this.addLog({event: {name: GameEventName.RoundStart, round: this.round + 1}, kind: "event"});
+    this.addEvent(GameEventName.RoundStart, {round: this.round + 1});
+    this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.PlantAuction});
+    this.addEvent(GameEventName.TurnOrder, {turnorder: this.players.map(player => player.color)});
+    this.addEvent(GameEventName.CurrentPlayer, {player: this.turnorder[0]});
+  }
 
-    for (const player of this.players) {
-      player.beginRound();
+  switchToNextPlayer() {
+    const currentIndex = this.turnorder.indexOf(this.currentPlayer);
+
+    if (currentIndex + 1 === this.turnorder.length) {
+      this.switchToNextPhase();
+    } else {
+      this.currentPlayer = this.turnorder[currentIndex + 1];
     }
+  }
 
-    this.currentPlayer = this.turnorder[0];
+  switchToNextPhase() {
+    switch (this.phase) {
+      case RoundPhase.PlantAuction: this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.CommoditiesTrading}); break;
+      case RoundPhase.CommoditiesTrading: this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.Construction}); break;
+      case RoundPhase.Construction: this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.Bureaucracy}); break;
+      case RoundPhase.Bureaucracy: this.roundStart(); break;
+    }
+  }
+
+  addEvent<name extends GameEventName>(name: name, data?: name extends keyof GameEventData ? GameEventData[name] : undefined) {
+    this.addLog({kind: "event", event: {name, ...(data ?? {})} as GameEvent})
   }
 
   processLogItem(item: LogItem) {
-    switch (item.event.name) {
-      case GameEventName.RoundStart:
-        this.round = item.event.round;
+    switch (item.kind) {
+      case "event":
+        const event = item.event;
+        switch (event.name) {
+          case GameEventName.RoundStart:
+            this.round = event.round;
+            for (const player of this.players) {
+              player.beginRound();
+            }
+            break;
+          case GameEventName.MajorPhaseChange:
+            this.majorPhase = event.phase;
+            break;
+          case GameEventName.PhaseChange:
+            this.phase = event.phase;
+            break;
+          case GameEventName.TurnOrder:
+            this.turnorder = event.turnorder;
+            break;
+          case GameEventName.CurrentPlayer:
+            this.currentPlayer = event.player;
+            break;
+          case GameEventName.AcquirePlant:
+            this.player(event.player).money -= event.cost;
+            this.player(event.player).plants.push(event.plant);
+            this.player(event.player).acquiredPlant = true;
+            break;
+          case GameEventName.DrawPlant:
+            this.board.market.current.plants.push(event.plant);
+            this.board.reorderMarkets();
+            break;
+        }
         break;
-      case GameEventName.MajorPhaseChange:
-        this.majorPhase = item.event.phase;
+      case "move":
         break;
-      case GameEventName.PhaseChange:
-        this.phase = item.event.phase;
-        break;
+    }
+  }
+
+  drawPlant() {
+    const plant = this.board.drawPlant();
+
+    if (plant) {
+      this.addEvent(GameEventName.DrawPlant, {plant});
     }
   }
 
