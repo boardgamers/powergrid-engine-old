@@ -14,7 +14,6 @@ export default abstract class BaseEngine<
   AvailableCommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>,
   CommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>> {
 
-  phase: Phase;
   players: Player[];
   round: number = 0;
   log: LogItem[] = [];
@@ -29,7 +28,7 @@ export default abstract class BaseEngine<
   abstract commands(): CommandStruct<Phase, MoveName, Player, this, AvailableCommandData, CommandData>;
 
   generateAvailableCommands() {
-    const functions = this.commands()[this.phase]!;
+    const functions = this.commands()[this.phase]!.moves!;
 
     const availableCommands: AvailableCommand<MoveName, AvailableCommandData, PlayerId>[] = [];
 
@@ -38,7 +37,7 @@ export default abstract class BaseEngine<
         continue;
       }
 
-      asserts<NonNullable<NonNullable<(ReturnType<this["commands"]>)[Phase]>[MoveName]>>(obj);
+      asserts<NonNullable<NonNullable<NonNullable<(ReturnType<this["commands"]>)[Phase]>["moves"]>[MoveName]>>(obj);
       asserts<MoveName>(move);
 
       if (!obj.available) {
@@ -73,7 +72,7 @@ export default abstract class BaseEngine<
 
     avail = avail?.filter(av => av.move === move.move, `Player ${player} can't execute command ${move.move}`);
 
-    this.commands()[this.phase]![move.move]?.exec(this, this.player(player), move);
+    this.commands()[this.phase]!.moves![move.move]?.exec(this, this.player(player), move);
 
     this.afterMove();
   }
@@ -130,7 +129,7 @@ export default abstract class BaseEngine<
     this.seed = data.seed;
     this.#rng = seedrandom("", {state: data.rngState});
     this.players = data.players;
-    this.phase = data.phase;
+    this.#phase = data.phase;
     this.availableCommands = data.availableCommands;
   }
 
@@ -142,7 +141,20 @@ export default abstract class BaseEngine<
     this.#currentPlayer = val;
   }
 
+  get phase() {
+    return this.#phase;
+  }
+
+  set phase(phase: Phase) {
+    this.#phase = phase;
+
+    if (this.commands()[phase]?.started) {
+      this.commands()[phase]!.started!(this);
+    }
+  }
+
   #rng?: seedrandom.prng;
   #seed = "";
   #currentPlayer: PlayerId;
+  #phase: Phase;
 }

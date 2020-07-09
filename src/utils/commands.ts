@@ -9,11 +9,14 @@ export type CommandStruct<
   CommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>,
 > = {
   [phase in Phase]?: {
-    [move in MoveName]?: {
-      available?: (engine: Engine, player: Player) => _AvailableCommandHelper<MoveName, AvailableCommandData, move>,
-      valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _CommandHelper<MoveName, AvailableCommandData, move>) => boolean,
-      exec: (engine: Engine, player: Player, move: _Command<MoveName, CommandData, move>) => void
-    }
+    moves?: {
+      [move in MoveName]?: {
+        available?: (engine: Engine, player: Player) => _AvailableCommandHelper<MoveName, AvailableCommandData, move>,
+        valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _CommandHelper<MoveName, AvailableCommandData, move>) => boolean,
+        exec: (engine: Engine, player: Player, move: _Command<MoveName, CommandData, move>) => void
+      }
+    },
+    started?: (engine: Engine) => void,
   }
 }
 

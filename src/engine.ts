@@ -44,18 +44,25 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
 
   roundStart() {
     this.addEvent(GameEventName.RoundStart, {round: this.round + 1});
-    this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.PlantAuction});
     this.addEvent(GameEventName.TurnOrder, {turnorder: this.players.map(player => player.color)});
-    this.addEvent(GameEventName.CurrentPlayer, {player: this.turnorder[0]});
+    this.addEvent(GameEventName.PhaseChange, {phase: RoundPhase.PlantAuction});
   }
 
   switchToNextPlayer() {
     const currentIndex = this.turnorder.indexOf(this.currentPlayer);
 
-    if (currentIndex + 1 === this.turnorder.length) {
-      this.switchToNextPhase();
+    if (this.phase === RoundPhase.Bureaucracy || this.phase === RoundPhase.PlantAuction) {
+      if (currentIndex + 1 === this.turnorder.length) {
+        this.switchToNextPhase();
+      } else {
+        this.currentPlayer = this.turnorder[currentIndex + 1];
+      }
     } else {
-      this.currentPlayer = this.turnorder[currentIndex + 1];
+      if (currentIndex === 0) {
+        this.switchToNextPhase();
+      } else {
+        this.currentPlayer = this.turnorder[currentIndex - 1];
+      }
     }
   }
 
