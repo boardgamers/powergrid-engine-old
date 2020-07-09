@@ -52,11 +52,13 @@ export default abstract class BaseEngine<
         if (availTest === true) {
           asserts<MoveNameWithoutData<MoveName, AvailableCommandData>>(move);
           availableCommands.push({move, player: this.currentPlayer} as unknown as AvailableCommand<MoveName, AvailableCommandData, PlayerId>);
-        } else if (Array.isArray(availTest)) {
-          asserts<MoveNameWithData<MoveName, AvailableCommandData>>(move);
-          availableCommands.push(...(availTest as any[]).map(x => ({data: x, move, player: this.currentPlayer}) as unknown as AvailableCommand<MoveName, AvailableCommandData, PlayerId>));
         } else {
-          availableCommands.push({...availTest as any, move, player: this.currentPlayer});
+          asserts<MoveNameWithData<MoveName, AvailableCommandData>>(move);
+          if (Array.isArray(availTest)) {
+            availableCommands.push(...availTest.map((x: AvailableCommandData[typeof move]) => ({data: x, move, player: this.currentPlayer})));
+          } else {
+            availableCommands.push({data: availTest, move, player: this.currentPlayer} as unknown as AvailableCommand<typeof move, AvailableCommandData, PlayerId>);
+          }
         }
       }
     }

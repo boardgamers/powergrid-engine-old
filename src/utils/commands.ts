@@ -11,7 +11,7 @@ export type CommandStruct<
   [phase in Phase]?: {
     [move in MoveName]?: {
       available?: (engine: Engine, player: Player) => _AvailableCommandHelper<MoveName, AvailableCommandData, move>,
-      valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _AvailableCommandHelper<MoveName, AvailableCommandData, move>) => boolean,
+      valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _CommandHelper<MoveName, AvailableCommandData, move>) => boolean,
       exec: (engine: Engine, player: Player, move: _Command<MoveName, CommandData, move>) => void
     }
   }
@@ -30,16 +30,16 @@ export type Commands<MoveName extends string, CommandData extends BaseCommandDat
 export type AvailableCommand<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>, PlayerId = number> = AvailableCommands<MoveName, AvailableCommandData, PlayerId>[MoveName];
 export type Command<MoveName extends string, CommandData extends BaseCommandData<MoveName>> = Commands<MoveName, CommandData>[MoveName];
 
-export type MoveNameWithoutData<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>> = Exclude<MoveName, Exclude<_MoveNameWithData<MoveName, AvailableCommandData>[MoveName], undefined>>;
+export type MoveNameWithoutData<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>> = Exclude<MoveName, Exclude<_MoveNameWithData<MoveName, AvailableCommandData>[MoveName], never>>;
 export type MoveNameWithData<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>> = Exclude<MoveName, MoveNameWithoutData<MoveName, AvailableCommandData>>;
 
-type _CommandHelper<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = move extends keyof CommandData ? CommandData[move] : undefined;
+type _CommandHelper<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = move extends keyof CommandData ? CommandData[move] : never;
 type _AvailableCommandHelper<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>, move extends MoveName> = move extends keyof AvailableCommandData ? AvailableCommandData[move] | AvailableCommandData[move][] | false : boolean;
 
-type _AvailableCommand<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>, move extends MoveName, PlayerId = number> = _CommandHelper<MoveName, AvailableCommandData, move> extends undefined ? {move: move, player: PlayerId} : {move: move, player: PlayerId, data: _CommandHelper<MoveName, AvailableCommandData, move>};
+type _AvailableCommand<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>, move extends MoveName, PlayerId = number> = _CommandHelper<MoveName, AvailableCommandData, move> extends never ? {move: move, player: PlayerId} : {move: move, player: PlayerId, data: _CommandHelper<MoveName, AvailableCommandData, move>};
 
-type _Command<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = _CommandHelper<MoveName, CommandData, move> extends undefined ? {move: move} : {move: move, data: _CommandHelper<MoveName, CommandData, move>};
+type _Command<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = _CommandHelper<MoveName, CommandData, move> extends never ? {move: move} : {move: move, data: _CommandHelper<MoveName, CommandData, move>};
 
 type _MoveNameWithData<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>> = {
-  [key in MoveName]:_CommandHelper<MoveName, AvailableCommandData, key> extends undefined ? undefined : key
+  [key in MoveName]:_CommandHelper<MoveName, AvailableCommandData, key> extends never ? never : key
 };
