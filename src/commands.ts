@@ -4,16 +4,19 @@ import type { Engine } from "./engine";
 import type { Player } from "./player";
 import type { CommandStruct, Command as BaseCommand } from "./utils/commands";
 import { GameEventName } from "./log";
-import PlayerColor from "./enums/player-color";
+import Resource from "./enums/resource";
+import { fromPairs, inRange } from "lodash";
 
 export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
   [MoveName.Bid]: {range: [number, number]};
+  [MoveName.Buy]: {bundles: Array<{price: number, count: number, resource: Resource}>};
 }
 
 export interface CommandArguments {
   [MoveName.Auction]: {plant: number};
   [MoveName.Bid]: {bid: number};
+  [MoveName.Buy]: {resource: Resource, price: number, count: number};
 }
 
 const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCommandArguments, CommandArguments> = {
@@ -119,12 +122,41 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         }
       },
       [MoveName.Buy]: {
-        // TODO
         available(engine: Engine, player: Player) {
+          const ret: {bundles: Array<{resource: Resource, price: number, count: number}>} = {bundles: []};
+
+          const space = fromPairs(Resource.values().map(res => [res, player.availableSpace(res)]).filter(x => x[1] > 0));
+
+          for (const pricePoint of engine.board.commodities) {
+            if (pricePoint.price > player.money) {
+              break;
+            }
+            for (const res of Object.keys(space) as Resource[]) {
+              if (pricePoint.resources.current[res] ?? 0 > 0) {
+                ret.bundles.push({price: pricePoint.price, count: Math.min(pricePoint.resources[res]!, space[res]!, Math.floor(player.money / pricePoint.price)), resource: res});
+              }
+            }
+          }
+
+          if (!ret.bundles.length) {
+            return false;
+          }
+          return ret;
+        },
+        valid(move, available) {
+          const bundle = available.bundles.find(bundle => bundle.price === move.price && bundle.resource === move.resource);
+
+          if (!bundle) {
+            return false;
+          }
+          if (!inRange(move.count, 1, bundle.count)) {
+            return false;
+          }
           return true;
         },
-        exec() {
-
+        exec(engine, player, move) {
+          player.money -= move.data.count * move.data.price;
+          player.resources[move.data.resource] += move.data.count;
         }
       }
     },

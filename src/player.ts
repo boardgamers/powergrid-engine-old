@@ -1,6 +1,7 @@
 import type Resource from "./enums/resource";
 import type Plant from "./plant";
 import type PlayerColor from "./enums/player-color";
+import { sumBy } from "lodash";
 
 export class Player {
   resources: {
@@ -25,5 +26,38 @@ export class Player {
 
   beginRound() {
     this.acquiredPlant = false;
+  }
+
+  totalSpace(resource: Resource) {
+    return sumBy(this.plantsForResource(resource), "intake") * 2;
+  }
+
+  plantsForResource(resource: Resource) {
+    return this.plants.filter(plant => plant.energy.includes(resource));
+  }
+
+  availableSpace(resource: Resource) {
+    const maxSpace = this.totalSpace(resource) - this.resources[resource];
+
+    if (maxSpace <= 0) {
+      return 0;
+    }
+
+    const sharedPlants = this.plantsForResource(resource).filter(plant => plant.energy.length === 2);
+
+    const sharedSpace = sumBy(sharedPlants, "intake") * 2;
+    const privateSpace = sharedSpace > maxSpace ? 0 : maxSpace - sharedSpace;
+
+    if (sharedSpace === 0) {
+      return privateSpace;
+    }
+
+    // Assumption: resource only shares space with one energy, and that energy only shares space with resource
+    const sharedEnergy = sharedPlants[0].energy.find(res => res !== resource)!;
+
+    const otherMaxSpace = this.totalSpace(sharedEnergy) - this.resources[sharedEnergy];
+    const encroachingSpace = sharedSpace - otherMaxSpace;
+
+    return privateSpace + (encroachingSpace > 0 ? sharedSpace - encroachingSpace : sharedSpace);
   }
 }

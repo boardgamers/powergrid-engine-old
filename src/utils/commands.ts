@@ -12,7 +12,7 @@ export type CommandStruct<
     moves?: {
       [move in MoveName]?: {
         available?: (engine: Engine, player: Player) => _AvailableCommandHelper<MoveName, AvailableCommandData, move>,
-        valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _CommandHelper<MoveName, AvailableCommandData, move>) => boolean,
+        valid?: (move: _CommandHelper<MoveName, CommandData, move>, available: _CommandHelper<MoveName, AvailableCommandData, move>, engine: Engine) => boolean,
         exec: (engine: Engine, player: Player, move: _Command<MoveName, CommandData, move>) => void
       }
     },

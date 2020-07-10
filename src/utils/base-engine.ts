@@ -72,7 +72,14 @@ export default abstract class BaseEngine<
 
     avail = avail?.filter(av => av.move === move.move, `Player ${player} can't execute command ${move.move}`);
 
-    this.commands()[this.phase]!.moves![move.move]?.exec(this, this.player(player), move);
+    const functions = this.commands()[this.phase]!.moves![move.move]!;
+
+    asserts<MoveNameWithData<MoveName, CommandData>>(move.move);
+    if (functions.valid && avail && !avail.some(data => functions.valid!((move as any).data, (data as any).data, this))) {
+      assert(false, "The command is not valid with the given arguments");
+    }
+
+    functions.exec(this, this.player(player), move);
 
     this.afterMove();
   }
