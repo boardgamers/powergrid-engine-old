@@ -147,6 +147,24 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     return this.players.find(pl => pl.color === color)!;
   }
 
+  @memoize()
+  formattedLinks() {
+    const links = new Map<string, Map<string, number>>();
+
+    for (const link of this.board.map.links) {
+      if (!links.has(link.nodes[0])) {
+        links.set(link.nodes[0], new Map());
+      }
+      if (!links.has(link.nodes[1])) {
+        links.set(link.nodes[1], new Map());
+      }
+      links.get(link.nodes[0])!.set(link.nodes[1], link.cost);
+      links.get(link.nodes[1])!.set(link.nodes[0], link.cost);
+    }
+
+    return links;
+  }
+
   get maxCitiesPerLocation() {
     if (this.majorPhase === MajorPhase.Step1) {
       return 1;

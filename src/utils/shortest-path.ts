@@ -1,4 +1,4 @@
-export default function shortestPath<T>(starts: T[], dests: T[], links: Map<T, Map<T, number>>): {path: T[]; cost: number} | undefined {
+export default function shortestPath<T>(starts: T[], dests: T[], links: Map<T, Map<T, number>>, maxCost = Infinity): {path: T[]; cost: number} | undefined {
   const destSet: Set<T> = new Set(dests);
   const pathTo: Map<T, {path: T[]; cost: number}> = new Map();
 
@@ -20,7 +20,7 @@ export default function shortestPath<T>(starts: T[], dests: T[], links: Map<T, M
     for (const hex of toExpand) {
       const curPath = pathTo.get(hex)!;
 
-      if (curPath.cost >= minToDest) {
+      if (curPath.cost >= minToDest || curPath.cost > maxCost) {
         continue;
       }
 
@@ -42,7 +42,7 @@ export default function shortestPath<T>(starts: T[], dests: T[], links: Map<T, M
         pathTo.set(neighbour, extendedPath);
         toExpandNext.push(neighbour);
 
-        if (destSet.has(neighbour) && extendedPath.cost < minToDest) {
+        if (destSet.has(neighbour) && extendedPath.cost < minToDest && extendedPath.cost <= maxCost) {
           minToDest = extendedPath.cost;
           bestPath = extendedPath;
         }

@@ -6,6 +6,7 @@ import type { CommandStruct, Command as BaseCommand } from "./utils/commands";
 import { GameEventName } from "./log";
 import Resource from "./enums/resource";
 import { fromPairs, inRange } from "lodash";
+import shortestPath from "./utils/shortest-path";
 
 export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
@@ -176,10 +177,21 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
       [MoveName.Build]: {
         available(engine, player) {
           const maxCities = engine.maxCitiesPerLocation;
-          const cities = Object.entries(engine.board.map.cities).filter(entry => entry[1].players.length < maxCities && 10 + 5 * entry[1].players.length <= player.money).map(entry => ({city: entry[0], cost: 10 + 5 * entry[1].players.length}));
+          const cities = Object.entries(engine.board.map.cities).filter(entry => entry[1].players.length < maxCities && 10 + 5 * entry[1].players.length <= player.money && !entry[1].players.includes(player.color)).map(entry => ({city: entry[0], cost: 10 + 5 * entry[1].players.length}));
 
           if (player.cities.length === 0) {
             return {cities};
+          }
+
+          const selectedCities: typeof cities = [];
+
+          for (const city of cities) {
+            const path = shortestPath(player.cities, [city.city], engine.formattedLinks(), player.money - city.cost);
+
+            if (!path) {
+              continue;
+            }
+            selectedCities.push({city: city.city, cost: city.cost + path.cost});
           }
 
           return false;
@@ -187,8 +199,10 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         valid(move, available) {
           return available.cities.some(x => x.city === move.city && x.cost === move.cost);
         },
-        exec() {
-
+        exec(engine, player, data) {
+          engine.board.map.cities[data.city].players.push(player.color);
+          player.cities.push(data.city);
+          player.money -= data.cost;
         }
       }
     },
