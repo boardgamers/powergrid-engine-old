@@ -74,12 +74,11 @@ export default abstract class BaseEngine<
 
     const functions = this.commands()[this.phase]!.moves![move.move]!;
 
-    asserts<MoveNameWithData<MoveName, CommandData>>(move.move);
     if (functions.valid && avail && !avail.some(data => functions.valid!((move as any).data, (data as any).data, this))) {
       assert(false, "The command is not valid with the given arguments");
     }
 
-    functions.exec(this, this.player(player), move);
+    functions.exec(this, this.player(player), (move as any).data);
 
     this.afterMove();
   }

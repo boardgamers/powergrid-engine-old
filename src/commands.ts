@@ -81,11 +81,11 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         valid(move: {plant: number}, available: {plants: number[]}) {
           return available.plants.includes(move.plant);
         },
-        exec(engine, player, move) {
+        exec(engine, player, data) {
           engine.auction = {
             participants: engine.turnorder.slice(engine.turnorder.indexOf(player.color)).filter(color => !engine.player(color).acquiredPlant),
             current: player.color,
-            plant: engine.board.market.current.plants.find(plant => plant.price === move.data.plant)!
+            plant: engine.board.market.current.plants.find(plant => plant.price === data.plant)!
           }
         }
       },
@@ -106,8 +106,8 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         valid (move: {bid: number}, available: {range: [number, number]}) {
           return move.bid >= available.range[0] && move.bid <= available.range[1] && Math.floor(move.bid) === move.bid;
         },
-        exec(engine, player, move) {
-          engine.auction!.bid = move.data.bid;
+        exec(engine, player, data) {
+          engine.auction!.bid = data.bid;
           engine.auction!.current = engine.auction!.participants[engine.auction!.participants.indexOf(player.color) + 1 % engine.auction!.participants.length];
         }
       }
@@ -156,9 +156,9 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
           }
           return true;
         },
-        exec(engine, player, move) {
-          player.money -= move.data.count * move.data.price;
-          player.resources[move.data.resource] += move.data.count;
+        exec(engine, player, data) {
+          player.money -= data.count * data.price;
+          player.resources[data.resource] += data.count;
         }
       }
     }
