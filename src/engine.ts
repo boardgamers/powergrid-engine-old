@@ -146,4 +146,14 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
   player(color: PlayerColor) {
     return this.players.find(pl => pl.color === color)!;
   }
+
+  get maxCitiesPerLocation() {
+    if (this.majorPhase === MajorPhase.Step1) {
+      return 1;
+    }
+    if (this.majorPhase === MajorPhase.Step2) {
+      return 2;
+    }
+    return 3;
+  }
 }

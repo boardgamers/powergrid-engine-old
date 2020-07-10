@@ -2,5 +2,6 @@ export enum MoveName {
   Pass = "pass",
   Auction = "auction",
   Bid = "bid",
-  Buy = "buy"
+  Buy = "buy",
+  Build = "build",
 }

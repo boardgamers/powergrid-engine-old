@@ -11,12 +11,14 @@ export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
   [MoveName.Bid]: {range: [number, number]};
   [MoveName.Buy]: {bundles: Array<{price: number, count: number, resource: Resource}>};
+  [MoveName.Build]: {cities: Array<{city: string, cost: number}>};
 }
 
 export interface CommandArguments {
   [MoveName.Auction]: {plant: number};
   [MoveName.Bid]: {bid: number};
   [MoveName.Buy]: {resource: Resource, price: number, count: number};
+  [MoveName.Build]: {city: string, cost: number};
 }
 
 const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCommandArguments, CommandArguments> = {
@@ -157,6 +159,36 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         exec(engine, player, move) {
           player.money -= move.data.count * move.data.price;
           player.resources[move.data.resource] += move.data.count;
+        }
+      }
+    }
+  },
+  [RoundPhase.Construction]: {
+    moves: {
+      [MoveName.Pass]: {
+        available(engine, player) {
+          return player.cities.length > 0;
+        },
+        exec(engine: Engine) {
+          engine.switchToNextPlayer();
+        }
+      },
+      [MoveName.Build]: {
+        available(engine, player) {
+          const maxCities = engine.maxCitiesPerLocation;
+          const cities = Object.entries(engine.board.map.cities).filter(entry => entry[1].players.length < maxCities && 10 + 5 * entry[1].players.length <= player.money).map(entry => ({city: entry[0], cost: 10 + 5 * entry[1].players.length}));
+
+          if (player.cities.length === 0) {
+            return {cities};
+          }
+
+          return false;
+        },
+        valid(move, available) {
+          return available.cities.some(x => x.city === move.city && x.cost === move.cost);
+        },
+        exec() {
+
         }
       }
     },

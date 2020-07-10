@@ -54,7 +54,7 @@ class Board {
     {price: 12, resources: {max: {uranium: 1}, current: {uranium: 0}}},
     {price: 14, resources: {max: {uranium: 1}, current: {uranium: 1}}},
     {price: 16, resources: {max: {uranium: 1}, current: {uranium: 1}}},
-  ];;
+  ];
 
   draw: {
     plants: {
