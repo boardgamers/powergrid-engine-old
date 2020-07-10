@@ -11,6 +11,7 @@ class Board {
     model: "us";
 
     cities: {[city: string]: {players: PlayerColor[]}};
+    links: {nodes: [string, string], cost: number}[];
   };
 
   pool: {
@@ -84,7 +85,8 @@ class Board {
 
     this.map = {
       model: "us",
-      cities: ([] as string[]).concat(...maps.us.zones.map(zone => zone.cities)).reduce((acc, city) => ({...acc, [city]: []}), {})
+      cities: ([] as string[]).concat(...maps.us.zones.map(zone => zone.cities)).reduce((acc, city) => ({...acc, [city]: []}), {}),
+      links: maps.us.links
     };
   }
 
