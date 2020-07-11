@@ -36,6 +36,14 @@ export class Player {
     return this.plants.filter(plant => plant.energy.includes(resource));
   }
 
+  plant(plantId: number) {
+    return this.plants.find(plant => plant.price === plantId);
+  }
+
+  getCityRewards(cities: number) {
+
+  }
+
   availableSpace(resource: Resource) {
     const maxSpace = this.totalSpace(resource) - this.resources[resource];
 

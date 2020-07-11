@@ -5,8 +5,9 @@ import type { Player } from "./player";
 import type { CommandStruct, Command as BaseCommand } from "./utils/commands";
 import { GameEventName } from "./log";
 import Resource from "./enums/resource";
-import { fromPairs, inRange } from "lodash";
+import { fromPairs, inRange, sum, sumBy } from "lodash";
 import shortestPath from "./utils/shortest-path";
+import { link } from "fs";
 
 export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
@@ -20,6 +21,7 @@ export interface CommandArguments {
   [MoveName.Bid]: {bid: number};
   [MoveName.Buy]: {resource: Resource, price: number, count: number};
   [MoveName.Build]: {city: string, cost: number};
+  [MoveName.PowerPlant]: {plants: Array<{plant: number, resources: Resource[]}>};
 }
 
 const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCommandArguments, CommandArguments> = {
@@ -167,9 +169,6 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
   [RoundPhase.Construction]: {
     moves: {
       [MoveName.Pass]: {
-        available(engine, player) {
-          return player.cities.length > 0;
-        },
         exec(engine: Engine) {
           engine.switchToNextPlayer();
         }
@@ -211,7 +210,50 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
     }
   },
   [RoundPhase.Bureaucracy]: {
+    moves: {
+      [MoveName.Pass]: {
+        exec(engine, player) {
+          player.getCityRewards(0);
+          engine.switchToNextPlayer();
+        }
+      },
+      [MoveName.PowerPlant]: {
+        available(engine, player) {
+          return player.plants.some(plant => sum(plant.energy.map(energy => player.resources[energy])) >= plant.intake);
+        },
+        valid(move, avail, engine, player) {
+          const resources: Resource[] = [];
+          const totals = {...player.resources};
+          for (const plantData of move.plants) {
+            const plant = player.plant(plantData.plant);
 
+            if (!plant) {
+              return false;
+            }
+            if (plant.intake !== plantData.resources.length) {
+              return false;
+            }
+            if (!plantData.resources.every(resource => plant.energy.includes(resource))) {
+              return false;
+            }
+            for (const resource of resources) {
+              totals[resource] -= 1;
+
+              if (totals[resource] < 0) {
+                return false;
+              }
+            }
+          }
+
+          return true;
+        },
+        exec(engine, player, move) {
+          const totalPower = sumBy(move.plants.map(plant => player.plant(plant.plant)), "power");
+          player.getCityRewards(Math.min(totalPower), player.cities.length);
+          engine.switchToNextPlayer();
+        }
+      }
+    }
   }
 }
 
