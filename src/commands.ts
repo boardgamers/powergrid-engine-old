@@ -249,7 +249,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         },
         exec(engine, player, move) {
           const totalPower = sumBy(move.plants.map(plant => player.plant(plant.plant)), "power");
-          player.getCityRewards(Math.min(totalPower), player.cities.length);
+          player.getCityRewards(Math.min(totalPower, player.cities.length));
           engine.switchToNextPlayer();
         }
       }

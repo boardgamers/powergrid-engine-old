@@ -13,7 +13,8 @@ export enum GameEventName {
   PhaseChange = "phasechange",
   MajorPhaseChange = "majorphasechange",
   DrawPlant = "drawplant",
-  GameEnd = "gameend"
+  GameEnd = "gameend",
+  GainMoney = "gainmoney"
 }
 
 export interface GameEventData {
@@ -23,7 +24,8 @@ export interface GameEventData {
   [GameEventName.DrawPlant]: {plant: Plant},
   [GameEventName.TurnOrder]: {turnorder: PlayerColor[]},
   [GameEventName.CurrentPlayer]: {player: PlayerColor},
-  [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number}
+  [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number},
+  [GameEventName.GainMoney]: {player: PlayerColor, money: number}
 }
 
 export type GameEvents = {[key in GameEventName]: key extends keyof GameEventData ? {name: key} & GameEventData[key] : {name: key}};

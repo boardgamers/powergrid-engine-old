@@ -35,6 +35,10 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
       this.players.push(new Player(colors[i]));
     }
 
+    for (const player of this.players) {
+      player.on("event", (event, data) => this.addEvent(event.name, {...data, player: player.color}));
+    }
+
     this.addEvent(GameEventName.GameStart);
     this.addEvent(GameEventName.MajorPhaseChange, {phase: MajorPhase.Step1});
 
@@ -110,6 +114,9 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
           case GameEventName.DrawPlant:
             this.board.market.current.plants.push(event.plant);
             this.board.reorderMarkets();
+            break;
+          case GameEventName.GainMoney:
+            this.player(event.player).money += event.money;
             break;
         }
         break;

@@ -2,8 +2,10 @@ import type Resource from "./enums/resource";
 import type Plant from "./plant";
 import type PlayerColor from "./enums/player-color";
 import { sumBy } from "lodash";
+import { EventEmitter } from "events";
+import { GameEventName } from "./log";
 
-export class Player {
+export class Player extends EventEmitter {
   resources: {
     [key in Resource]: number
   } = {
@@ -21,7 +23,7 @@ export class Player {
   cities: string[] = [];
 
   constructor (public color: PlayerColor) {
-
+    super();
   }
 
   beginRound() {
@@ -41,7 +43,7 @@ export class Player {
   }
 
   getCityRewards(cities: number) {
-
+    this.emit("event", GameEventName.GainMoney, {money: cityRewards[Math.min(cities, 20)]});
   }
 
   availableSpace(resource: Resource) {
@@ -69,3 +71,5 @@ export class Player {
     return privateSpace + (encroachingSpace > 0 ? sharedSpace - encroachingSpace : sharedSpace);
   }
 }
+
+const cityRewards = [10, 22, 33, 44, 54, 64, 73, 82, 90, 98, 105, 112, 118, 124, 128, 134, 138, 142, 145, 148, 150];
