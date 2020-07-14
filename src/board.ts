@@ -1,4 +1,4 @@
-import { sortBy } from "lodash";
+import { sortBy, flatten, flattenDeep, fromPairs, pick } from "lodash";
 import type PlayerColor from "./enums/player-color";
 import Resource from "./enums/resource";
 import type Plant from "./plant";
@@ -67,9 +67,11 @@ class Board extends EventEmitter {
     }
   }
 
-  constructor(rng: () => number) {
+  constructor() {
     super();
+  }
 
+  init(players: number, rng: () => number) {
     this.draw = {
       plants: {
         current: [plants.find(plant => plant.price === 13)!, ...shuffle(plants.filter(plant => plant.price > 10 && plant.price !== 13), rng)],
@@ -88,11 +90,65 @@ class Board extends EventEmitter {
       }
     };
 
+    const model = maps.us;
+
+    const zoneByCities = fromPairs(flattenDeep(model.zones.map(zone => zone.cities.map(city => [city, zone.key]))) as [string, string][]);
+
     this.map = {
       model: "us",
-      cities: ([] as string[]).concat(...maps.us.zones.map(zone => zone.cities)).reduce((acc, city) => ({...acc, [city]: []}), {}),
-      links: maps.us.links
+      cities: ([] as string[]).concat(...model.zones.map(zone => zone.cities)).reduce((acc, city) => ({...acc, [city]: {players: [], zone: zoneByCities[city]}}), {}),
+      links: model.links,
     };
+
+    const nZones = [3, 3, 4, 5, 5][6 - players];
+
+    const pickedZones = new Set(model.zones[Math.floor(rng() * model.zones.length)].key);
+
+    const mapLinks = this.mapLinks();
+
+    while (pickedZones.size < nZones) {
+      const cities = shuffle(flatten(model.zones.filter(zone => pickedZones.has(zone.key)).map(zone => zone.cities)), rng);
+
+      let found = false;
+      for (const city of cities) {
+        for (const key of shuffle([...mapLinks.get(city)!.keys()], rng)) {
+          if (!pickedZones.has(zoneByCities[key])) {
+            pickedZones.add(zoneByCities[key]);
+            found = true;
+            break;
+          }
+        }
+
+        if (found) {
+          break;
+        }
+      }
+    }
+
+    const selectedCities = Object.keys(this.map.cities).filter(city => pickedZones.has(zoneByCities[city]));
+
+    this.map.cities = pick(this.map.cities, selectedCities);
+
+    const selectedCitiesSet = new Set(selectedCities);
+
+    this.map.links = this.map.links.filter(link => link.nodes.every(node => selectedCitiesSet.has(node)));
+  }
+
+  mapLinks() {
+    const links = new Map<string, Map<string, number>>();
+
+    for (const link of this.map.links) {
+      if (!links.has(link.nodes[0])) {
+        links.set(link.nodes[0], new Map());
+      }
+      if (!links.has(link.nodes[1])) {
+        links.set(link.nodes[1], new Map());
+      }
+      links.get(link.nodes[0])!.set(link.nodes[1], link.cost);
+      links.get(link.nodes[1])!.set(link.nodes[0], link.cost);
+    }
+
+    return links;
   }
 
   reorderMarkets() {
