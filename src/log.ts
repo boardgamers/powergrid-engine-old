@@ -3,6 +3,7 @@ import type Plant from "./plant";
 import type PlayerColor from "./enums/player-color";
 import type { Command } from "./commands";
 import { MoveName } from "./enums/moves";
+import Resource from "./enums/resource";
 
 export enum GameEventName {
   GameStart = "gamestart",
@@ -14,7 +15,8 @@ export enum GameEventName {
   MajorPhaseChange = "majorphasechange",
   DrawPlant = "drawplant",
   GameEnd = "gameend",
-  GainMoney = "gainmoney"
+  GainMoney = "gainmoney",
+  UseResources = "useresources"
 }
 
 export interface GameEventData {
@@ -25,7 +27,8 @@ export interface GameEventData {
   [GameEventName.TurnOrder]: {turnorder: PlayerColor[]},
   [GameEventName.CurrentPlayer]: {player: PlayerColor},
   [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number},
-  [GameEventName.GainMoney]: {player: PlayerColor, money: number}
+  [GameEventName.GainMoney]: {player: PlayerColor, money: number},
+  [GameEventName.UseResources]: {[resource in Resource]?: number}
 }
 
 export type GameEvents = {[key in GameEventName]: key extends keyof GameEventData ? {name: key} & GameEventData[key] : {name: key}};

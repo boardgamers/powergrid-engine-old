@@ -249,6 +249,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         },
         exec(engine, player, move) {
           const totalPower = sumBy(move.plants.map(plant => player.plant(plant.plant)), "power");
+          engine.addEvent(GameEventName.UseResources, ([] as Resource[]).concat(...move.plants.map(plant => plant.resources)).reduce((acc, resource) => ({...acc, [resource]: (acc[resource] ?? 0) + 1}), {}));
           player.getCityRewards(Math.min(totalPower, player.cities.length));
           engine.switchToNextPlayer();
         }
