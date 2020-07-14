@@ -9,6 +9,7 @@ import Plant from "./plant";
 import BaseEngine from "./utils/base-engine";
 import { MoveName } from "./enums/moves";
 import commands from './commands';
+import { omit } from "lodash";
 
 export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, LogItem, PlayerColor> {
   turnorder: PlayerColor[];
@@ -123,6 +124,15 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
             for (const [resource, number] of Object.entries(event.resources)) {
               this.player(event.player).resources[resource] -= number!;
               this.board.pool.resources[resource] += number!;
+            }
+            break;
+          case GameEventName.FillResources:
+            for (const [price, resources] of Object.entries(omit(event, 'name'))) {
+              const item = this.board.commodities.find(item => item.price === +price)!;
+
+              for (const [resource, count] of Object.entries(resources)) {
+                item.resources[resource] += count;
+              }
             }
             break;
         }
