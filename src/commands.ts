@@ -250,6 +250,8 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
           engine.switchToNextPlayer();
         }
       }
+    }, ended(engine) {
+      engine.board.refillResources(engine.players.length, engine.majorPhase);
     }
   }
 }

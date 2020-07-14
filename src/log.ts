@@ -16,7 +16,8 @@ export enum GameEventName {
   DrawPlant = "drawplant",
   GameEnd = "gameend",
   GainMoney = "gainmoney",
-  UseResources = "useresources"
+  UseResources = "useresources",
+  FillResources = "refill"
 }
 
 export interface GameEventData {
@@ -28,7 +29,8 @@ export interface GameEventData {
   [GameEventName.CurrentPlayer]: {player: PlayerColor},
   [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number},
   [GameEventName.GainMoney]: {player: PlayerColor, money: number},
-  [GameEventName.UseResources]: {player: PlayerColor, resources: {[resource in Resource]?: number}}
+  [GameEventName.UseResources]: {player: PlayerColor, resources: {[resource in Resource]?: number}},
+  [GameEventName.FillResources]: {[key: number]: {[resource in Resource]?: number}}
 }
 
 export type GameEvents = {[key in GameEventName]: key extends keyof GameEventData ? {name: key} & GameEventData[key] : {name: key}};

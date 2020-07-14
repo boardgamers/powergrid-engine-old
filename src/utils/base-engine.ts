@@ -97,6 +97,18 @@ export default abstract class BaseEngine<
    */
   abstract processLogItem(item: LogItem): void;
 
+  replay(items: LogItem[]) {
+    this.#replaying = true;
+
+    try {
+      for (const item of items) {
+        this.processLogItem(item);
+      }
+    } finally {
+      this.#replaying = false;
+    }
+  }
+
   get seed() {
     return this.#seed;
   }
@@ -152,10 +164,13 @@ export default abstract class BaseEngine<
   }
 
   set phase(phase: Phase) {
+    if (this.#phase && !this.#replaying) {
+      this.commands()[this.#phase]?.ended?.(this);
+    }
     this.#phase = phase;
 
-    if (this.commands()[phase]?.started) {
-      this.commands()[phase]!.started!(this);
+    if (!this.#replaying) {
+      this.commands()[phase]?.started?.(this);
     }
   }
 
@@ -163,4 +178,5 @@ export default abstract class BaseEngine<
   #seed = "";
   #currentPlayer: PlayerId;
   #phase: Phase;
+  #replaying = false;
 }

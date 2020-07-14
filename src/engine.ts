@@ -38,6 +38,7 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     for (const player of this.players) {
       player.on("event", (event, data) => this.addEvent(event.name, {...data, player: player.color}));
     }
+    this.board.on("event", (event, data) => this.addEvent(event.name, data));
 
     this.addEvent(GameEventName.GameStart);
     this.addEvent(GameEventName.MajorPhaseChange, {phase: MajorPhase.Step1});

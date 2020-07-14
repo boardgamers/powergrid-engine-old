@@ -17,6 +17,7 @@ export type CommandStruct<
       }
     },
     started?: (engine: Engine) => void,
+    ended?: (engine: Engine) => void,
   }
 }
 
