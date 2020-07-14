@@ -78,7 +78,7 @@ export default abstract class BaseEngine<
       assert(false, "The command is not valid with the given arguments");
     }
 
-    functions.exec(this, this.player(player), (move as any).data);
+    functions.exec?.(this, this.player(player), (move as any).data);
 
     this.afterMove();
   }

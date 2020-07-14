@@ -118,9 +118,24 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
           case GameEventName.GainMoney:
             this.player(event.player).money += event.money;
             break;
+          case GameEventName.UseResources:
+            for (const [resource, number] of Object.entries(event.resources)) {
+              this.player(event.player).resources[resource] -= number!;
+              this.board.pool.resources[resource] += number!;
+            }
+            break;
         }
         break;
       case "move":
+        const move = item.move;
+        switch (move.name) {
+          case MoveName.Buy:
+            const player = this.player(item.player);
+            player.money -= move.data.count * move.data.price;
+            player.resources[move.data.resource] += move.data.count;
+            this.board.commodities.find(comm => comm.price === move.data.price)!.resources[move.data.resource] -= move.data.count;
+            break;
+        }
         break;
     }
   }

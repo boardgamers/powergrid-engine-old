@@ -28,14 +28,14 @@ export interface GameEventData {
   [GameEventName.CurrentPlayer]: {player: PlayerColor},
   [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number},
   [GameEventName.GainMoney]: {player: PlayerColor, money: number},
-  [GameEventName.UseResources]: {[resource in Resource]?: number}
+  [GameEventName.UseResources]: {player: PlayerColor, resources: {[resource in Resource]?: number}}
 }
 
 export type GameEvents = {[key in GameEventName]: key extends keyof GameEventData ? {name: key} & GameEventData[key] : {name: key}};
 
 export type GameEvent = GameEvents[GameEventName];
 
-type Distribute<U> = U extends {move: MoveName} ? Omit<{[key in keyof U]: U}, "move"> & {name: U["move"]} : never;
+type Distribute<U> = U extends {move: MoveName} ? Omit<U, "move"> & {name: U["move"]} : never;
 
 export type LogItem = {
   kind: "event",

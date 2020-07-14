@@ -158,10 +158,6 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
             return false;
           }
           return true;
-        },
-        exec(engine, player, data) {
-          player.money -= data.count * data.price;
-          player.resources[data.resource] += data.count;
         }
       }
     }
@@ -249,7 +245,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
         },
         exec(engine, player, move) {
           const totalPower = sumBy(move.plants.map(plant => player.plant(plant.plant)), "power");
-          engine.addEvent(GameEventName.UseResources, ([] as Resource[]).concat(...move.plants.map(plant => plant.resources)).reduce((acc, resource) => ({...acc, [resource]: (acc[resource] ?? 0) + 1}), {}));
+          engine.addEvent(GameEventName.UseResources, {player: player.color, resources: ([] as Resource[]).concat(...move.plants.map(plant => plant.resources)).reduce((acc, resource) => ({...acc, [resource]: (acc[resource] ?? 0) + 1}), {})});
           player.getCityRewards(Math.min(totalPower, player.cities.length));
           engine.switchToNextPlayer();
         }
