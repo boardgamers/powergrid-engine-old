@@ -8,6 +8,7 @@ export {Engine} from "./src/engine";
 export {Player} from "./src/player";
 export {GameEventName, GameEventData, GameEvents, GameEvent, LogItem} from "./src/log";
 export {AvailableCommandArguments, CommandArguments} from "./src/commands";
+export type {Command} from './src/commands';
 export {MoveName} from "./src/enums/moves";
 export {MajorPhase, RoundPhase} from "./src/enums/phases";
 
