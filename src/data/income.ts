@@ -20,4 +20,6 @@ const incomeByCities = [
   145,
   148,
   150
-]
+];
+
+export {incomeByCities};

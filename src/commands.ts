@@ -7,7 +7,6 @@ import { GameEventName } from "./log";
 import Resource from "./enums/resource";
 import { fromPairs, inRange, sum, sumBy } from "lodash";
 import shortestPath from "./utils/shortest-path";
-import { link } from "fs";
 
 export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
