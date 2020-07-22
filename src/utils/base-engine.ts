@@ -175,6 +175,10 @@ export default abstract class BaseEngine<
     }
   }
 
+  get replaying() {
+    return this.#replaying;
+  }
+
   #rng?: seedrandom.prng;
   #seed = "";
   #currentPlayer: PlayerId;
