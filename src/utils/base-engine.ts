@@ -9,8 +9,8 @@ export default abstract class BaseEngine<
   Phase extends string = string,
   MoveName extends string = string,
   GameEventName extends string = string,
-  LogItem extends {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}} = {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}},
   PlayerId = number,
+  LogItem extends {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}, player: PlayerId} = {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}, player: PlayerId},
   AvailableCommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>,
   CommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>> {
 
@@ -70,14 +70,15 @@ export default abstract class BaseEngine<
 
     assert(avail?.length ?? 0 > 0, `It's not the turn of player ${player}`);
 
-    avail = avail?.filter(av => av.move === move.move, `Player ${player} can't execute command ${move.move}`);
+    avail = avail?.filter(av => av.move === move.name, `Player ${player} can't execute command ${move.name}`);
 
-    const functions = this.commands()[this.phase]!.moves![move.move]!;
+    const functions = this.commands()[this.phase]!.moves![move.name]!;
 
     if (functions.valid && avail && !avail.some(data => functions.valid!((move as any).data, (data as any).data, this, this.player(player)))) {
       assert(false, "The command is not valid with the given arguments");
     }
 
+    this.addLog({move, kind: "move", player} as any as LogItem);
     functions.exec?.(this, this.player(player), (move as any).data);
 
     this.afterMove();

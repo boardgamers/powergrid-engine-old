@@ -42,7 +42,7 @@ type _AvailableCommandHelper<MoveName extends string, AvailableCommandData exten
 
 type _AvailableCommand<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>, move extends MoveName, PlayerId = number> = _CommandHelper<MoveName, AvailableCommandData, move> extends never ? {move: move, player: PlayerId} : {move: move, player: PlayerId, data: _CommandHelper<MoveName, AvailableCommandData, move>};
 
-type _Command<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = _CommandHelper<MoveName, CommandData, move> extends never ? {move: move} : {move: move, data: _CommandHelper<MoveName, CommandData, move>};
+type _Command<MoveName extends string, CommandData extends BaseCommandData<MoveName>, move extends MoveName> = _CommandHelper<MoveName, CommandData, move> extends never ? {name: move} : {name: move, data: _CommandHelper<MoveName, CommandData, move>};
 
 type _MoveNameWithData<MoveName extends string, AvailableCommandData extends BaseCommandData<MoveName>> = {
   [key in MoveName]:_CommandHelper<MoveName, AvailableCommandData, key> extends never ? never : key

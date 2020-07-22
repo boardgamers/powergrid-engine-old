@@ -37,7 +37,7 @@ export type GameEvents = {[key in GameEventName]: key extends keyof GameEventDat
 
 export type GameEvent = GameEvents[GameEventName];
 
-type Distribute<U> = U extends {move: MoveName} ? Omit<U, "move"> & {name: U["move"]} : never;
+// type Distribute<U> = U extends {move: MoveName} ? Omit<U, "move"> & {name: U["move"]} : never;
 
 export type LogItem = {
   kind: "event",
@@ -45,5 +45,5 @@ export type LogItem = {
 } | {
   kind: "move",
   player: PlayerColor,
-  move: Distribute<Command>
+  move: Command
 };

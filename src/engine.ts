@@ -11,7 +11,7 @@ import { MoveName } from "./enums/moves";
 import commands from './commands';
 import { omit } from "lodash";
 
-export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, LogItem, PlayerColor> {
+export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventName, PlayerColor, LogItem> {
   turnorder: PlayerColor[];
 
   auction?: {
