@@ -1,5 +1,6 @@
 import { sortBy, flatten, flattenDeep, fromPairs, pick } from "lodash";
 import type PlayerColor from "./enums/player-color";
+import type {UsCity} from "./maps/us";
 import Resource from "./enums/resource";
 import type Plant from "./plant";
 import { shuffle } from "./utils/random";
@@ -107,7 +108,7 @@ class Board extends EventEmitter {
     const mapLinks = this.mapLinks();
 
     while (pickedZones.size < nZones) {
-      const cities = shuffle(flatten(model.zones.filter(zone => pickedZones.has(zone.key)).map(zone => zone.cities)), rng);
+      const cities: UsCity[] = shuffle(flatten(model.zones.filter(zone => pickedZones.has(zone.key)).map(zone => zone.cities)), rng);
 
       let found = false;
       for (const city of cities) {
