@@ -15,7 +15,7 @@
     "node"
   ],
   "include": [
-    "src/**/*.ts",
+    "src/",
     "index.ts",
     "wrapper.ts"
   ],

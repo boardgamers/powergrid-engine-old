@@ -126,8 +126,10 @@ export default abstract class BaseEngine<
 
   @memoize()
   player(id: PlayerId) {
-    assert(typeof id === "number", "You need to override AbstractEngine.player if you use a custom player id");
-    return this.players[id];
+    if (typeof id === "number") {
+      return this.players[id];
+    }
+    assert(false, "You need to override AbstractEngine.player if you use a custom player id");
   }
 
   toJSON() {
