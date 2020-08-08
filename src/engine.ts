@@ -195,4 +195,25 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
     }
     return 3;
   }
+
+  toJSON() {
+    const json = super.toJSON();
+
+    return {
+      ...json,
+      turnorder: this.turnorder,
+      auction: this.auction,
+      board: this.board,
+      majorPhase: this.majorPhase
+    };
+  }
+
+  fromJSON(data: ReturnType<this["toJSON"]>) {
+    super.fromJSON(data);
+
+    this.turnorder = data.turnorder;
+    this.auction = data.auction;
+    this.board = data.board;
+    this.majorPhase = data.majorPhase;
+  }
 }
