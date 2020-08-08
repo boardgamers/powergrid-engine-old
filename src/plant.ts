@@ -5,4 +5,4 @@ export default interface Plant {
   energy: Resource[];
   intake: number;
   power: number;
-}
+};;;;;;;;;;;;

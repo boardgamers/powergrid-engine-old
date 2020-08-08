@@ -15,7 +15,7 @@ export class Player extends EventEmitter {
     coal: 0,
     garbage: 0
   };
-  money: number = 50;
+  money = 50;
   // To reset every round
   acquiredPlant = false;
   name?: string;

@@ -88,7 +88,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
             participants: engine.turnorder.slice(engine.turnorder.indexOf(player.color)).filter(color => !engine.player(color).acquiredPlant),
             current: player.color,
             plant: engine.board.market.current.plants.find(plant => plant.price === data.plant)!
-          }
+          };
         }
       },
       [MoveName.Bid]: {
@@ -253,7 +253,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
       engine.board.refillResources(engine.players.length, engine.majorPhase);
     }
   }
-}
+};
 
 export type Command = BaseCommand<MoveName, CommandArguments>;
 

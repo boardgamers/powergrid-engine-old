@@ -129,11 +129,11 @@ const links: UsLink[] = [
   {nodes: ["detroit", "chicago"], cost: 7},
   {nodes: ["detroit", "duluth"], cost: 15},
   {nodes: ["pittsburgh", "cincinnati"], cost: 4}
-]
+];
 
 const map = {
   zones,
   links
-}
+};
 
 export default map;

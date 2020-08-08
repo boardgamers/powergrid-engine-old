@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /**
  * Decorator to cache results of function calls based on their first argument
  * @param hashFunction
@@ -39,7 +41,7 @@ function getNewFunction(originalMethod: () => void, hashFunction?: (...args: any
 					value: new Map<any, any>()
 				});
 			}
-			let myMap: Map<any, any> = this[propMapName];
+			const myMap: Map<any, any> = this[propMapName];
 
 			let hashKey: any;
 

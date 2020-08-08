@@ -2,7 +2,6 @@ import { RoundPhase, MajorPhase } from "./enums/phases";
 import type Plant from "./plant";
 import type PlayerColor from "./enums/player-color";
 import type { Command } from "./commands";
-import { MoveName } from "./enums/moves";
 import Resource from "./enums/resource";
 
 export enum GameEventName {

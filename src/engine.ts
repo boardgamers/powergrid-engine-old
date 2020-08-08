@@ -83,12 +83,12 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
   }
 
   addEvent<name extends GameEventName>(name: name, data?: name extends keyof GameEventData ? GameEventData[name] : undefined) {
-    this.addLog({kind: "event", event: {name, ...(data ?? {})} as GameEvent})
+    this.addLog({kind: "event", event: {name, ...(data ?? {})} as GameEvent});
   }
 
   processLogItem(item: LogItem) {
     switch (item.kind) {
-      case "event":
+      case "event": {
         const event = item.event;
         switch (event.name) {
           case GameEventName.RoundStart:
@@ -138,17 +138,19 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
             break;
         }
         break;
-      case "move":
+      } case "move": {
         const move = item.move;
         switch (move.name) {
-          case MoveName.Buy:
+          case MoveName.Buy: {
             const player = this.player(item.player);
             player.money -= move.data.count * move.data.price;
             player.resources[move.data.resource] += move.data.count;
             this.board.commodities.find(comm => comm.price === move.data.price)!.resources[move.data.resource] -= move.data.count;
             break;
+          }
         }
         break;
+      }
     }
   }
 

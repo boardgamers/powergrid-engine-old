@@ -19,4 +19,4 @@ describe("Engine", () => {
 
     expect(restored.turnorder).to.deep.equal(engine.turnorder);
   });
-})
+});
