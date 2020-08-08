@@ -1,7 +1,7 @@
 export type UsCity = "seattle" | "portland" | "boise" | "billings" | "cheyenne" | "denver" | "omaha" | "fargo" | "duluth" | "minneapolis" | "chicago" | "cincinnati" | "st. louis" | "knoxville" | "kansas city" | "oklahoma city" | "dallas" | "memphis" | "houston" | "new orleans" | "birmingham" | "norfolk" | "raleigh" | "savannah" | "atlanta" | "jacksonville" | "tampa" | "miami" | "detroit" | "buffalo" | "new york" | "boston" | "philadelphia" | "washington d.c." | "pittsburgh" | "san francisco" | "salt lake city" | "las vegas" | "santa fe" | "phoenix" | "san diego" | "los angeles";
 
 type UsZone = "purple" | "yellow" | "red" | "green" | "brown" | "blue";
-type UsZoneInfo = Array<{key: UsZone, cities: UsCity[]}>;
+type UsZoneInfo = Array<{key: UsZone; cities: UsCity[]}>;
 
 const zones: UsZoneInfo = [{
   key: "purple",
@@ -23,7 +23,7 @@ const zones: UsZoneInfo = [{
   cities: ["san francisco", "salt lake city", "las vegas", "santa fe", "phoenix", "san diego", "los angeles"]
 }];
 
-type UsLink = {nodes: [UsCity, UsCity], cost: number};
+type UsLink = {nodes: [UsCity, UsCity]; cost: number};
 
 const links: UsLink[] = [
   // Purple

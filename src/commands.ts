@@ -11,16 +11,16 @@ import shortestPath from "./utils/shortest-path";
 export interface AvailableCommandArguments {
   [MoveName.Auction]: {plants: number[]};
   [MoveName.Bid]: {range: [number, number]};
-  [MoveName.Buy]: {bundles: Array<{price: number, count: number, resource: Resource}>};
-  [MoveName.Build]: {cities: Array<{city: string, cost: number}>};
+  [MoveName.Buy]: {bundles: Array<{price: number; count: number; resource: Resource}>};
+  [MoveName.Build]: {cities: Array<{city: string; cost: number}>};
 }
 
 export interface CommandArguments {
   [MoveName.Auction]: {plant: number};
   [MoveName.Bid]: {bid: number};
-  [MoveName.Buy]: {resource: Resource, price: number, count: number};
-  [MoveName.Build]: {city: string, cost: number};
-  [MoveName.PowerPlant]: {plants: Array<{plant: number, resources: Resource[]}>};
+  [MoveName.Buy]: {resource: Resource; price: number; count: number};
+  [MoveName.Build]: {city: string; cost: number};
+  [MoveName.PowerPlant]: {plants: Array<{plant: number; resources: Resource[]}>};
 }
 
 const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCommandArguments, CommandArguments> = {
@@ -127,7 +127,7 @@ const commands: CommandStruct<RoundPhase, MoveName, Player, Engine, AvailableCom
       },
       [MoveName.Buy]: {
         available(engine: Engine, player: Player) {
-          const ret: {bundles: Array<{resource: Resource, price: number, count: number}>} = {bundles: []};
+          const ret: {bundles: Array<{resource: Resource; price: number; count: number}>} = {bundles: []};
 
           const space = fromPairs(Resource.values().map(res => [res, player.availableSpace(res)]).filter(x => x[1] > 0));
 

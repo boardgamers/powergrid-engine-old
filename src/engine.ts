@@ -15,10 +15,10 @@ export class Engine extends BaseEngine<Player, RoundPhase, MoveName, GameEventNa
   turnorder: PlayerColor[];
 
   auction?: {
-    participants: PlayerColor[],
-    current: PlayerColor,
-    plant: Plant,
-    bid?: number,
+    participants: PlayerColor[];
+    current: PlayerColor;
+    plant: Plant;
+    bid?: number;
   }
 
   board: Board;

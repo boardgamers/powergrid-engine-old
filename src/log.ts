@@ -20,16 +20,16 @@ export enum GameEventName {
 }
 
 export interface GameEventData {
-  [GameEventName.RoundStart]: {round: number},
-  [GameEventName.PhaseChange]: {phase: RoundPhase},
-  [GameEventName.MajorPhaseChange]: {phase: MajorPhase},
-  [GameEventName.DrawPlant]: {plant: Plant},
-  [GameEventName.TurnOrder]: {turnorder: PlayerColor[]},
-  [GameEventName.CurrentPlayer]: {player: PlayerColor},
-  [GameEventName.AcquirePlant]: {player: PlayerColor, plant: Plant, cost: number},
-  [GameEventName.GainMoney]: {player: PlayerColor, money: number},
-  [GameEventName.UseResources]: {player: PlayerColor, resources: {[resource in Resource]?: number}},
-  [GameEventName.FillResources]: {[key: number]: {[resource in Resource]?: number}}
+  [GameEventName.RoundStart]: {round: number};
+  [GameEventName.PhaseChange]: {phase: RoundPhase};
+  [GameEventName.MajorPhaseChange]: {phase: MajorPhase};
+  [GameEventName.DrawPlant]: {plant: Plant};
+  [GameEventName.TurnOrder]: {turnorder: PlayerColor[]};
+  [GameEventName.CurrentPlayer]: {player: PlayerColor};
+  [GameEventName.AcquirePlant]: {player: PlayerColor; plant: Plant; cost: number};
+  [GameEventName.GainMoney]: {player: PlayerColor; money: number};
+  [GameEventName.UseResources]: {player: PlayerColor; resources: {[resource in Resource]?: number}};
+  [GameEventName.FillResources]: {[key: number]: {[resource in Resource]?: number}};
 }
 
 export type GameEvents = {[key in GameEventName]: key extends keyof GameEventData ? {name: key} & GameEventData[key] : {name: key}};
@@ -39,10 +39,10 @@ export type GameEvent = GameEvents[GameEventName];
 // type Distribute<U> = U extends {move: MoveName} ? Omit<U, "move"> & {name: U["move"]} : never;
 
 export type LogItem = {
-  kind: "event",
-  event: GameEvent
+  kind: "event";
+  event: GameEvent;
 } | {
-  kind: "move",
-  player: PlayerColor,
-  move: Command
+  kind: "move";
+  player: PlayerColor;
+  move: Command;
 };

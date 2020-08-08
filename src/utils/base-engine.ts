@@ -10,7 +10,7 @@ export default abstract class BaseEngine<
   MoveName extends string = string,
   GameEventName extends string = string,
   PlayerId = number,
-  LogItem extends {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}, player: PlayerId} = {kind: "event", event: {name: GameEventName}} | {kind: "move", move: {name: MoveName}, player: PlayerId},
+  LogItem extends {kind: "event"; event: {name: GameEventName}} | {kind: "move"; move: {name: MoveName}; player: PlayerId} = {kind: "event"; event: {name: GameEventName}} | {kind: "move"; move: {name: MoveName}; player: PlayerId},
   AvailableCommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>,
   CommandData extends BaseCommandData<MoveName> = BaseCommandData<MoveName>> {
 

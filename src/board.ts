@@ -15,7 +15,7 @@ class Board extends EventEmitter {
     model: "us";
 
     cities: {[city: string]: {players: PlayerColor[]}};
-    links: {nodes: [string, string], cost: number}[];
+    links: {nodes: [string, string]; cost: number}[];
   };
 
   pool: {
@@ -41,11 +41,11 @@ class Board extends EventEmitter {
   };
 
   commodities: Array<{
-    price: number,
+    price: number;
     resources: {
-      current: {[key in Resource]?: number},
-      max: {[key in Resource]?: number}
-    }
+      current: {[key in Resource]?: number};
+      max: {[key in Resource]?: number};
+    };
   }> = [
     {price: 1, resources: {max: {coal: 3, oil: 3, uranium: 1, garbage: 3}, current: {coal: 3, oil: 0, uranium: 0, garbage: 0}}},
     {price: 2, resources: {max: {coal: 3, oil: 3, uranium: 1, garbage: 3}, current: {coal: 3, oil: 0, uranium: 0, garbage: 0}}},
@@ -65,7 +65,7 @@ class Board extends EventEmitter {
     plants: {
       current: Plant[];
       future: Plant[];
-    }
+    };
   }
 
   constructor() {
@@ -158,7 +158,7 @@ class Board extends EventEmitter {
     this.market.future.plants = marketPlants.slice(this.market.current.max, this.market.current.max + this.market.future.max);
   }
 
-  refillResources(players :number, step: MajorPhase) {
+  refillResources(players: number, step: MajorPhase) {
     const ret: {[price: number]: {[resource in Resource]?: number}} = {};
 
     for (const resource of Resource.values()) {
