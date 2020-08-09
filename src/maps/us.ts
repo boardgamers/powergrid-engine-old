@@ -86,7 +86,6 @@ const links: UsLink[] = [
   {nodes: ["buffalo", "new york"], cost: 8},
   {nodes: ["boston", "new york"], cost: 3},
   {nodes: ["philadelphia", "new york"], cost: 0},
-  {nodes: ["new york", "boston"], cost: 3},
   {nodes: ["washington d.c.", "philadelphia"], cost: 3},
   {nodes: ["washington d.c.", "pittsburgh"], cost: 6},
   // PURPLE - BLUE
