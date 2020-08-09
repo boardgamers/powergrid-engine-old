@@ -7,6 +7,7 @@ describe("Engine", () => {
     engine.init(2, "seed");
 
     expect(engine.turnorder[0]).to.equal("red");
+    expect(engine.currentPlayer).to.equal("red");
   });
 
   it ("should load and save from JSON", () => {
