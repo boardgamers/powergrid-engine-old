@@ -6,8 +6,8 @@ describe("Engine", () => {
     const engine = new Engine();
     engine.init(2, "seed");
 
-    expect(engine.turnorder[0]).to.equal("red");
-    expect(engine.currentPlayer).to.equal("red");
+    expect(engine.turnorder[0]).to.equal("blue");
+    expect(engine.currentPlayer).to.equal("blue");
   });
 
   it ("should load and save from JSON", () => {

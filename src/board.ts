@@ -1,4 +1,4 @@
-import { sortBy, flatten, flattenDeep, fromPairs, pick } from "lodash";
+import { sortBy, flatten, flattenDeep, fromPairs, pick, flattenDepth } from "lodash";
 import type PlayerColor from "./enums/player-color";
 import type {UsCity} from "./maps/us";
 import Resource from "./enums/resource";
@@ -93,7 +93,8 @@ class Board extends EventEmitter {
 
     const model = maps.us;
 
-    const zoneByCities = fromPairs(flattenDeep(model.zones.map(zone => zone.cities.map(city => [city, zone.key]))) as [string, string][]);
+    const zonePairs = flatten(model.zones.map(zone => zone.cities.map(city => [city, zone.key])));
+    const zoneByCities = fromPairs(zonePairs as [string, string][]);
 
     this.map = {
       model: "us",
@@ -101,9 +102,9 @@ class Board extends EventEmitter {
       links: model.links,
     };
 
-    const nZones = [3, 3, 4, 5, 5][6 - players];
+    const nZones = [3, 3, 4, 5, 5][players - 2];
 
-    const pickedZones = new Set(model.zones[Math.floor(rng() * model.zones.length)].key);
+    const pickedZones = new Set<string>([model.zones[Math.floor(rng() * model.zones.length)].key as string]);
 
     const mapLinks = this.mapLinks();
 

@@ -11,6 +11,7 @@ describe("Board", () => {
 
       board.init(2, rnd);
 
+      expect(Object.keys(board.map.cities).length).to.equal(7*3);
       expect(board.map.links.length).to.be.greaterThan(5);
     });
   })
