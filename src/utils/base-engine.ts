@@ -99,29 +99,29 @@ export default abstract class BaseEngine<
   abstract processLogItem(item: LogItem): void;
 
   replay(items: LogItem[]) {
-    this.#replaying = true;
+    this._replaying = true;
 
     try {
       for (const item of items) {
         this.processLogItem(item);
       }
     } finally {
-      this.#replaying = false;
+      this._replaying = false;
     }
   }
 
   get seed() {
-    return this.#seed;
+    return this._seed;
   }
   set seed(newSeed: string) {
-    this.#seed = newSeed;
-    this.#rng = undefined;
+    this._seed = newSeed;
+    this._rng = undefined;
   }
   get rng(): seedrandom.prng {
-    if (!this.#rng) {
-      this.#rng = seedrandom(this.seed, {state: true});
+    if (!this._rng) {
+      this._rng = seedrandom(this.seed, {state: true});
     }
-    return this.#rng;
+    return this._rng;
   }
 
   @memoize()
@@ -148,42 +148,42 @@ export default abstract class BaseEngine<
     this.log = data.log;
     this.round = data.round;
     this.seed = data.seed;
-    this.#rng = seedrandom("", {state: data.rngState});
+    this._rng = seedrandom("", {state: data.rngState});
     this.players = data.players;
-    this.#phase = data.phase;
+    this._phase = data.phase;
     this.availableCommands = data.availableCommands;
   }
 
   get currentPlayer() {
-    return this.#currentPlayer;
+    return this._currentPlayer;
   }
 
   set currentPlayer(val: PlayerId) {
-    this.#currentPlayer = val;
+    this._currentPlayer = val;
   }
 
   get phase() {
-    return this.#phase;
+    return this._phase;
   }
 
   set phase(phase: Phase) {
-    if (this.#phase && !this.#replaying) {
-      this.commands()[this.#phase]?.ended?.(this);
+    if (this._phase && !this._replaying) {
+      this.commands()[this._phase]?.ended?.(this);
     }
-    this.#phase = phase;
+    this._phase = phase;
 
-    if (!this.#replaying) {
+    if (!this._replaying) {
       this.commands()[phase]?.started?.(this);
     }
   }
 
   get replaying() {
-    return this.#replaying;
+    return this._replaying;
   }
 
-  #rng?: seedrandom.prng;
-  #seed = "";
-  #currentPlayer: PlayerId;
-  #phase: Phase;
-  #replaying = false;
+  _rng?: seedrandom.prng;
+  _seed = "";
+  _currentPlayer: PlayerId;
+  _phase: Phase;
+  _replaying = false;
 }
