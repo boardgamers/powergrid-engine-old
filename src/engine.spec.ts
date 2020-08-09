@@ -19,5 +19,6 @@ describe("Engine", () => {
     restored.fromJSON(stringified);
 
     expect(restored.turnorder).to.deep.equal(engine.turnorder);
+    expect(restored.currentPlayer).to.deep.equal(engine.currentPlayer);
   });
 });

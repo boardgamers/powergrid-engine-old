@@ -140,7 +140,8 @@ export default abstract class BaseEngine<
       rngState : this.rng.state(),
       players: this.players,
       phase: this.phase,
-      availableCommands: this.availableCommands
+      availableCommands: this.availableCommands,
+      currentPlayer: this.currentPlayer
     };
   }
 
@@ -152,6 +153,7 @@ export default abstract class BaseEngine<
     this.players = data.players;
     this._phase = data.phase;
     this.availableCommands = data.availableCommands;
+    this._currentPlayer = data.currentPlayer;
   }
 
   get currentPlayer() {
