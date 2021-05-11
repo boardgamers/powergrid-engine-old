@@ -22,7 +22,7 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "seedrandom": "^3.0.5"
   },
   "scripts": {
